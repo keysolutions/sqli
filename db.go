@@ -35,21 +35,16 @@ func Open(driverName, dataSourceName string) (*DB, error) {
 // boilerplate around looping through the returned rows. The Scanner Scan method from
 // the provided scanner is called on each interation of the row cursor loop.
 //
-// type peopleScanner struct {
-//     people []*person
-// }
+// Query calls Scan on each row, which can be used like:
 //
-// func (p *peopleScanner) Scan(row sqli.Row) error {
-//     var person Person
-//     if err := row.Scan(&person.Name); err != nil {
-//          return err
-//     }
-//     p.people = append(p.people, &person)
-//     return nil
-// }
-//
-// s := &peopleScanner{}
-// db.Query(s, "SELECT name FROM people")
+//  func (p *peopleScanner) Scan(row sqli.Row) error {
+//      var person Person
+//      if err := row.Scan(&person.Name); err != nil {
+//           return err
+//      }
+//      p.people = append(p.people, &person)
+//      return nil
+//  }
 func (db *DB) Query(scanner Scanner, query string, args ...interface{}) error {
 	rows, err := db.DB.Query(query, args...)
 	if err != nil {
