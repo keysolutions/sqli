@@ -51,7 +51,7 @@ func (p *PeopleScanner) Scan(row sqli.Row) error {
 
 Or even middleware functions to wrap duplicate logic.
 
-```
+```go
 type middleware func(row sqli.Row) error
 
 func (m middleware) Scan(row sqli.Row) error {
