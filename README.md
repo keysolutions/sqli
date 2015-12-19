@@ -26,7 +26,7 @@ type Person struct {
     Age  int32
 }
 
-func (p *Person) Scan(row sql.Row) err {
+func (p *Person) Scan(row sqli.Row) err {
     return row.Scan(&p.Name, &p.Age)
 }
 
