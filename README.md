@@ -15,7 +15,11 @@ The additional `QueryIn` functions like `Query` but help build variadic paramete
 ```go
 package main
 
-import "github.com/keysolutions/sqli"
+import (
+    "log"
+
+    "github.com/keysolutions/sqli"
+)
 
 type Person struct {
     Name string
@@ -27,6 +31,12 @@ func (p *Person) Scan(row sql.Row) err {
 }
 
 func main() {
+    db, err := sqli.Open("driver", "name")
+    if err != nil {
+        log.Fatalf("Unable to open database: %v", err)
+    }
+    defer db.Close()
+
     var person Person
     db.QueryRow(&person, "SELECT name, age FROM people WHERE id = ?", 1)
 }
