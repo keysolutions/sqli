@@ -20,6 +20,13 @@ type Scanner interface {
 	Scan(row Row) error
 }
 
+// ScannerFn satifies the Scanner interface for a function type. The function will
+// be called for each row.
+type ScannerFn func(Row) error
+
+// Scan calls the scanner function and returns its result.
+func (s ScannerFn) Scan(row Row) error { return s(row) }
+
 // Open opens a database specified by the database driver name and data source name.
 // The arguments are passed to the database/sql Open function to retrive the
 // database handle it provides.
