@@ -1,6 +1,9 @@
 package sqli
 
-import "database/sql"
+import (
+	"context"
+	"database/sql"
+)
 
 // DB is a wrapper around the database/sql database handle to provide the
 // query scanner interface functions.
@@ -53,7 +56,24 @@ func Open(driverName, dataSourceName string) (*DB, error) {
 //      return nil
 //  }
 func (db *DB) Query(scanner Scanner, query string, args ...interface{}) error {
-	rows, err := db.DB.Query(query, args...)
+	return db.QueryContext(context.Background(), scanner, query, args...)
+}
+
+// QueryIn operates like Query but expands arguments for IN clauses.
+// IN arguments are to be passed as slices (e.g. []int{1, 2, 3}).
+func (db *DB) QueryIn(scanner Scanner, query string, args ...interface{}) error {
+	return db.QueryInContext(context.Background(), scanner, query, args...)
+}
+
+// QueryRow operates like Query but on a single row. The Scanner Scan function will
+// be called only once.
+func (db *DB) QueryRow(scanner Scanner, query string, args ...interface{}) error {
+	return db.QueryRowContext(context.Background(), scanner, query, args...)
+}
+
+// QueryContext performs a query utilizing the supplied context.
+func (db *DB) QueryContext(ctx context.Context, scanner Scanner, query string, args ...interface{}) error {
+	rows, err := db.DB.QueryContext(ctx, query, args...)
 	if err != nil {
 		return err
 	}
@@ -70,15 +90,13 @@ func (db *DB) Query(scanner Scanner, query string, args ...interface{}) error {
 	return rows.Close()
 }
 
-// QueryIn operates like Query but expands arguments for IN clauses.
-// IN arguments are to be passed as slices (e.g. []int{1, 2, 3}).
-func (db *DB) QueryIn(scanner Scanner, query string, args ...interface{}) error {
+// QueryInContext performs an in query utilizing the supplied context.
+func (db *DB) QueryInContext(ctx context.Context, scanner Scanner, query string, args ...interface{}) error {
 	query, args = In(query, args...)
-	return db.Query(scanner, query, args...)
+	return db.QueryContext(ctx, scanner, query, args...)
 }
 
-// QueryRow operates like Query but on a single row. The Scanner Scan function will
-// be called only once.
-func (db *DB) QueryRow(scanner Scanner, query string, args ...interface{}) error {
-	return scanner.Scan(db.DB.QueryRow(query, args...))
+// QueryRowContext performs a query on a single row utlizing the supplied context.
+func (db *DB) QueryRowContext(ctx context.Context, scanner Scanner, query string, args ...interface{}) error {
+	return scanner.Scan(db.DB.QueryRowContext(ctx, query, args...))
 }
