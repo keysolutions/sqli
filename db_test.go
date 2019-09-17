@@ -5,7 +5,7 @@ import "testing"
 func newTestDB(t *testing.T, name string) *DB {
 	db, err := Open("test", name)
 	if err != nil {
-		t.Fatal("Open: %v", err)
+		t.Fatalf("Open: %v", err)
 	}
 	exec(t, db, "WIPE")
 	exec(t, db, "CREATE|users|id=int64,name=string")
